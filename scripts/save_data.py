@@ -110,7 +110,7 @@ env.render('human')
 
 for episode in range(args.episodes):
 
-    save_folder = '/home/erl/rl-starter-files/data/traj_{:03d}'.format(episode)
+    save_folder = '../data/traj_{:03d}'.format(episode)
     if not os.path.exists(save_folder):
             os.mkdir(save_folder)
 
