@@ -23,7 +23,7 @@ class ExpertAgent:
         # cost to arrive at this object
         self.idx_to_cost = {
             1:      1,      # empty
-            2:      100,    # wall
+            2:      None,   # wall, impassable
             8:      1,      # goal
             9:      10,     # lava
             11:     0.5,    # lawn
@@ -37,6 +37,9 @@ class ExpertAgent:
 
         # displacement to control
         self.disp_to_cont = dict(zip(displacements, controls))
+
+        self.agent_pos = None
+        self.goal_pos = None
 
     def reset(self, grid, agent_pos):
         """
@@ -59,6 +62,7 @@ class ExpertAgent:
     def encode_cost(self):
         """
         Defines a cost function for one step transitions
+        state to next state cost is equal to cost of arriving at next state
         """
         # construct cost graph
         cost_graph = np.zeros((self.num_nodes, self.num_nodes))
@@ -67,6 +71,10 @@ class ExpertAgent:
                 idx = self.sub2ind(i, j)
                 cost = self.idx_to_cost[self.grid[i, j]]
                 
+                # skip assigning cost to walls
+                if not cost:
+                    continue
+
                 for a in range(4): 
                     pred_i, pred_j = np.array([i, j]) - np.array(self.cont_to_disp[a])
                     
@@ -105,6 +113,7 @@ class ExpertAgent:
         Run shortest path algorithm to get paths from all nodes to goal
         """
         goal_i, goal_j = np.where(self.grid == self.obj_to_idx["Goal"])
+        self.goal_pos = [goal_i, goal_j]
         goal_idx = self.sub2ind(goal_i, goal_j)
 
         cost_graph = csr_matrix(self.encode_cost())
@@ -117,6 +126,7 @@ class ExpertAgent:
         """
         Extracts the optimal controls from expert shortest path
         starting from agent position
+        Returns empty list if no shortest path exists
         """
         path = []
         idx = self.sub2ind(*self.agent_pos)
