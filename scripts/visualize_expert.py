@@ -110,7 +110,8 @@ if __name__ == '__main__':
         help='number of episodes to collect expert data')
     parser.add_argument(
         '--save_dir', type=str, 
-        default=os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/data/',
+        default=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) 
+            + '/data/expert_data/',
         help='directory to save the expert demonstrations')
     args = parser.parse_args()
     main()
